@@ -1,9 +1,12 @@
 import tkinter as tk
+from time import sleep
 
+from Game import Game
 from Grid import Grid
 
 
 class Application(tk.Frame):
+    game = None
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -22,7 +25,7 @@ class Application(tk.Frame):
         self.canvas.pack(side="top", padx=5, pady=5)
 
         self.start_button = tk.Button(self)
-        self.start_button["text"] = "Start"
+        self.start_button["text"] = "Step"
         self.start_button["command"] = self.start
         self.start_button.pack(side="left", padx=5, pady=5)
 
@@ -35,10 +38,16 @@ class Application(tk.Frame):
         self.close.pack(side="left", padx=5, pady=5)
 
     def start(self):
-        print("Started")
+        if not self.game:
+            self.game = Game(self.grid.state)
+
+        new_state = self.game.update()
+        self.grid.state = new_state
+        self.grid.redraw()
+        # sleep(self.game.interval)
 
     def stop(self):
-        print("Stopped")
+        self.game.running = False
 
 root = tk.Tk()
 app = Application(master=root)
