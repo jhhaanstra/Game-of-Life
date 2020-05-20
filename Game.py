@@ -41,7 +41,7 @@ class Game(object):
                         count=living_neighbours_count
                     ))
 
-                if self.state[x_count][y_count] == States.ALIVE and living_neighbours_count < 2:
+                if self.state[x_count][y_count] == States.ALIVE and (living_neighbours_count < 2 or living_neighbours_count > 3):
                     new_state[x_count][y_count] = States.DEAD
 
         self.state = new_state
