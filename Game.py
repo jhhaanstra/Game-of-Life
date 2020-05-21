@@ -30,7 +30,6 @@ class Game(object):
                     self.game_state[Vector(x, y)] = self.state[x][y]
 
     def update(self) -> dict:
-        # new_state = deepcopy(self.state)
         new_state = {}
 
         for position, state in self.game_state.items():
@@ -47,8 +46,14 @@ class Game(object):
                     count=living_neighbours_count
                 ))
 
+            # - Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            # - Any live cell with more than three live neighbours dies, as if by overpopulation.
             if state == States.ALIVE and (living_neighbours_count < 2 or living_neighbours_count > 3):
                 new_state[position] = States.DEAD
+            # - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+            elif state == States.DEAD and living_neighbours_count == 3:
+                new_state[position] = States.ALIVE
+            # - Any live cell with two or three live neighbours lives on to the next generation.
             else:
                 new_state[position] = state
 

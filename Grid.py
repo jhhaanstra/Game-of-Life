@@ -83,6 +83,9 @@ class Grid(object):
             if self.state[x][y] == States.VACANT:
                 self.state[x][y] = States.ALIVE
                 self.game_state[Vector(x, y)] = States.ALIVE
+            elif self.state[x][y] == States.ALIVE:
+                self.state[x][y] = States.DEAD
+                self.game_state[Vector(x, y)] = States.DEAD
             else:
                 self.state[x][y] = States.VACANT
                 self.game_state[Vector(x, y)] = States.VACANT
