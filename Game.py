@@ -1,61 +1,56 @@
 from copy import deepcopy
-from enum import Enum
 from itertools import permutations
 
-
-class States(Enum):
-    DEAD = 1
-    ALIVE = 2
-    VACANT = 3
+from Grid import States, Vector
 
 
 class Game(object):
+
+    NEIGHBOURING_POSITIONS = [
+        Vector(1, 0),
+        Vector(0, 1),
+        Vector(1, 1),
+        Vector(-1, 0),
+        Vector(0, -1),
+        Vector(-1, -1)
+    ]
+
     interval = 1
     running = True
-    state = []
+    game_state = {}
+    dead_cells = []
     width = 20
     height = 15
 
     def __init__(self, state: list):
         self.state = state
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.state[x][y] != States.VACANT:
+                    self.game_state[Vector(x, y)] = self.state[x][y]
 
-    def update(self) -> list:
-        new_state = deepcopy(self.state)
+    def update(self) -> dict:
+        # new_state = deepcopy(self.state)
+        new_state = {}
 
-        for x_count, row in enumerate(self.state):
-            for y_count, col in enumerate(row):
-                living_neighbours_count = 0
-
-                for neighbour in permutations(range(-1, 2), 2):
-                    if self.is_alive(x_count + neighbour[0], y_count + neighbour[1]):
+        for position, state in self.game_state.items():
+            living_neighbours_count = 0
+            for neighbour in self.NEIGHBOURING_POSITIONS:
+                neighbouring_position = (position + neighbour)
+                if neighbouring_position in self.game_state:
+                    if self.game_state[neighbouring_position] == States.ALIVE:
                         living_neighbours_count += 1
 
-                for i in [-1, 1]:
-                    if self.is_alive(x_count + i, y_count + i):
-                        living_neighbours_count += 1
+            if living_neighbours_count > 0:
+                print("{position} has living_neighbours_alive: {count}".format(
+                    position=str(position),
+                    count=living_neighbours_count
+                ))
 
-                if living_neighbours_count > 0:
-                    print("[{x}, {y}] has living_neighbours_alive: {count}".format(
-                        x=x_count,
-                        y=y_count,
-                        count=living_neighbours_count
-                    ))
+            if state == States.ALIVE and (living_neighbours_count < 2 or living_neighbours_count > 3):
+                new_state[position] = States.DEAD
+            else:
+                new_state[position] = state
 
-                if self.state[x_count][y_count] == States.ALIVE and (living_neighbours_count < 2 or living_neighbours_count > 3):
-                    new_state[x_count][y_count] = States.DEAD
-
-        self.state = new_state
-
-        return self.state
-
-    def is_alive(self, x, y) -> bool:
-        try:
-            return (self.state[x][y] == States.ALIVE)
-            return False
-        except IndexError:
-            pass
-
-
-
-
-
+        self.game_state = new_state
+        return self.game_state

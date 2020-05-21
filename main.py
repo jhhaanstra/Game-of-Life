@@ -1,5 +1,4 @@
 import tkinter as tk
-from time import sleep
 
 from Game import Game
 from Grid import Grid
@@ -42,7 +41,8 @@ class Application(tk.Frame):
             self.game = Game(self.grid.state)
 
         new_state = self.game.update()
-        self.grid.state = new_state
+        # self.grid.state = new_state
+        self.grid.apply_game_state(new_state)
         self.grid.redraw()
         # sleep(self.game.interval)
 

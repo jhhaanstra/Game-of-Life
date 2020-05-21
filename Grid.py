@@ -1,7 +1,42 @@
+from enum import Enum
 from math import floor
 
-from Game import States
+
 from tkinter import Canvas, Event
+
+
+class States(Enum):
+    DEAD = 1
+    ALIVE = 2
+    VACANT = 3
+
+
+class Vector(object):
+    def __init__(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    def as_coord(self) -> tuple:
+        return self.x, self.y
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __eq__(self, other) -> bool:
+        return self.x == other.x and \
+               self.y == other.y
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __str__(self) -> str:
+        return "[{}, {}]".format(self.x, self.y)
+
+
+class Cell(object):
+    def __init__(self, vector: object, state: States):
+        self.vector = vector
+        self.state = state
 
 
 class Grid(object):
@@ -9,38 +44,62 @@ class Grid(object):
     rect_size = 25
     width = 20
     height = 15
-    state = []
     occupied_fill = "#2f3eb5"
     vacant_fill = "#c0e5e5"
+    dead_fill = "#42632f"
     outline_color = "#ced1e8"
 
     def __init__(self, canvas: Canvas, rect_size: int = 25):
         self.canvas = canvas
         self.rect_size = rect_size
         self.state = [[States.VACANT for y in range(self.height)] for x in range(self.width)]
+        self.game_state = {}
         self.canvas.bind("<Button-1>", self.update)
 
     def draw(self):
-        for x_count, row in enumerate(self.state):
-            for y_count, col in enumerate(row):
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.state[x][y] == States.ALIVE:
+                    fill = self.occupied_fill
+                elif self.state[x][y] == States.DEAD:
+                    fill = self.dead_fill
+                else:
+                    fill = self.vacant_fill
+
                 self.canvas.create_rectangle(
-                    x_count * self.rect_size,
-                    y_count * self.rect_size,
-                    (x_count * self.rect_size) + self.rect_size,
-                    (y_count * self.rect_size) + self.rect_size,
+                    x * self.rect_size,
+                    y * self.rect_size,
+                    (x * self.rect_size) + self.rect_size,
+                    (y * self.rect_size) + self.rect_size,
                     outline=self.outline_color,
-                    fill=self.occupied_fill if col == States.ALIVE else self.vacant_fill
+                    fill=fill
                 )
 
     def update(self, event: Event):
-        x_coord = floor(event.x / self.rect_size)
-        y_coord = floor(event.y / self.rect_size)
+        x = floor(event.x / self.rect_size)
+        y = floor(event.y / self.rect_size)
+
         try:
-            cell_to_update = self.state[x_coord][y_coord]
-            self.state[x_coord][y_coord] = States.ALIVE if cell_to_update == States.VACANT else States.VACANT
+            if self.state[x][y] == States.VACANT:
+                self.state[x][y] = States.ALIVE
+                self.game_state[Vector(x, y)] = States.ALIVE
+            else:
+                self.state[x][y] = States.VACANT
+                self.game_state[Vector(x, y)] = States.VACANT
             self.redraw()
         except IndexError:
             pass
+
+    def apply_game_state(self, new_game_state: dict):
+        self.game_state = new_game_state
+
+        for x in range(self.width):
+            for y in range(self.height):
+                position = Vector(x, y)
+                if position in self.game_state:
+                    self.state[x][y] = self.game_state[position]
+                else:
+                    self.state[x][y] = States.VACANT
 
     def redraw(self):
         self.canvas.delete("all")
