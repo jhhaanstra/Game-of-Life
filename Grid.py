@@ -8,7 +8,6 @@ from tkinter import Canvas, Event
 class States(Enum):
     DEAD = 1
     ALIVE = 2
-    VACANT = 3
 
 
 class Vector(object):
@@ -20,11 +19,12 @@ class Vector(object):
         return self.x, self.y
 
     def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
+        total_x = self.x + other.x
+        total_y = self.y + other.y
+        return Vector(total_x, total_y)
 
     def __eq__(self, other) -> bool:
-        return self.x == other.x and \
-               self.y == other.y
+        return self.x == other.x and self.y == other.y
 
     def __hash__(self):
         return hash((self.x, self.y))
@@ -45,14 +45,13 @@ class Grid(object):
     width = 20
     height = 15
     occupied_fill = "#2f3eb5"
-    vacant_fill = "#c0e5e5"
-    dead_fill = "#42632f"
+    dead_fill = "#c0e5e5"
     outline_color = "#ced1e8"
 
     def __init__(self, canvas: Canvas, rect_size: int = 25):
         self.canvas = canvas
         self.rect_size = rect_size
-        self.state = [[States.VACANT for y in range(self.height)] for x in range(self.width)]
+        self.state = [[States.DEAD for y in range(self.height)] for x in range(self.width)]
         self.game_state = {}
         self.canvas.bind("<Button-1>", self.update)
 
@@ -80,15 +79,12 @@ class Grid(object):
         y = floor(event.y / self.rect_size)
 
         try:
-            if self.state[x][y] == States.VACANT:
+            if self.state[x][y] == States.DEAD:
                 self.state[x][y] = States.ALIVE
                 self.game_state[Vector(x, y)] = States.ALIVE
             elif self.state[x][y] == States.ALIVE:
                 self.state[x][y] = States.DEAD
                 self.game_state[Vector(x, y)] = States.DEAD
-            else:
-                self.state[x][y] = States.VACANT
-                self.game_state[Vector(x, y)] = States.VACANT
             self.redraw()
         except IndexError:
             pass
@@ -99,10 +95,10 @@ class Grid(object):
         for x in range(self.width):
             for y in range(self.height):
                 position = Vector(x, y)
-                if position in self.game_state:
-                    self.state[x][y] = self.game_state[position]
+                if position in new_game_state:
+                    self.state[x][y] = new_game_state[position]
                 else:
-                    self.state[x][y] = States.VACANT
+                    self.state[x][y] = States.DEAD
 
     def redraw(self):
         self.canvas.delete("all")
