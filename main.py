@@ -38,7 +38,7 @@ class Application(tk.Frame):
 
     def start(self):
         if not self.game:
-            self.game = Game(self.grid.state)
+            self.game = Game(self.grid.game_state)
 
         new_state = self.game.update()
         # self.grid.state = new_state
