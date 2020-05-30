@@ -46,9 +46,12 @@ class Game(object):
                     living_neighbours_count += 1
 
                 if neighbouring_position not in neighbours:
-                    neighbours[neighbouring_position] = 0
+                    neighbours[neighbouring_position] = 1
                 else:
                     neighbours[neighbouring_position] += 1
+
+                if neighbours[neighbouring_position] == 3:
+                    new_state.append(neighbouring_position)
 
             if living_neighbours_count > 0:
                 print("{position} has living_neighbours_alive: {count}".format(
@@ -62,16 +65,16 @@ class Game(object):
             #     pass
 
             # - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-            if living_neighbours_count == 3:
+            if living_neighbours_count == 3 or living_neighbours_count == 2:
                 new_state.append(position)
 
             # # - Any live cell with two or three live neighbours lives on to the next generation.
             # else:
             #     new_state.append(position)
 
-        for neighbouring_position, count in neighbours.items():
-            if count == 3:
-                new_state.append(neighbouring_position)
+        # for neighbouring_position, count in neighbours.items():
+        #     if count == 3:
+        #         new_state.append(neighbouring_position)
 
         self.game_state = new_state
         return self.game_state
