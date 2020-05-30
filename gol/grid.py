@@ -1,7 +1,6 @@
 from enum import Enum
 from math import floor
 
-
 from tkinter import Canvas, Event
 
 

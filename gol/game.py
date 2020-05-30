@@ -1,8 +1,7 @@
-from gol.Grid import Vector
+from gol.grid import Vector
 
 
 class Game(object):
-
     NEIGHBOURING_POSITIONS = [
         Vector(1, 0),
         Vector(0, 1),
@@ -35,10 +34,11 @@ class Game(object):
                 if neighbouring_position in self.game_state:
                     living_neighbours_count += 1
 
-                if neighbouring_position not in neighbours:
-                    neighbours[neighbouring_position] = 1
-                else:
-                    neighbours[neighbouring_position] += 1
+                if neighbouring_position not in self.game_state:
+                    if neighbouring_position not in neighbours:
+                        neighbours[neighbouring_position] = 1
+                    else:
+                        neighbours[neighbouring_position] += 1
 
             if living_neighbours_count > 0:
                 print("{position} has living_neighbours_alive: {count}".format(
