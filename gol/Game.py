@@ -1,7 +1,4 @@
-from copy import deepcopy
-from itertools import permutations
-
-from Grid import States, Vector
+from gol.Grid import Vector
 
 
 class Game(object):
@@ -43,9 +40,6 @@ class Game(object):
                 else:
                     neighbours[neighbouring_position] += 1
 
-                if neighbours[neighbouring_position] == 3:
-                    new_state.append(neighbouring_position)
-
             if living_neighbours_count > 0:
                 print("{position} has living_neighbours_alive: {count}".format(
                     position=str(position),
@@ -53,6 +47,10 @@ class Game(object):
                 ))
 
             if living_neighbours_count == 3 or living_neighbours_count == 2:
+                new_state.append(position)
+
+        for position, count in neighbours.items():
+            if count == 3:
                 new_state.append(position)
 
         self.game_state = new_state

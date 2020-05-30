@@ -1,7 +1,7 @@
 import tkinter as tk
 
-from Game import Game
-from Grid import Grid
+from gol.Game import Game
+from gol.Grid import Grid
 
 
 class Application(tk.Frame):
