@@ -40,12 +40,6 @@ class Game(object):
                     else:
                         neighbours[neighbouring_position] += 1
 
-            if living_neighbours_count > 0:
-                print("{position} has living_neighbours_alive: {count}".format(
-                    position=str(position),
-                    count=living_neighbours_count
-                ))
-
             if living_neighbours_count == 3 or living_neighbours_count == 2:
                 new_state.append(position)
 

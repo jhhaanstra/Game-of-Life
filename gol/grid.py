@@ -43,9 +43,9 @@ class Grid(object):
     rect_size = 25
     width = 20
     height = 15
-    occupied_fill = "#2f3eb5"
-    dead_fill = "#c0e5e5"
-    outline_color = "#ced1e8"
+    occupied_fill = "#000000"
+    dead_fill = "#ffffff"
+    outline_color = "#c1c1c1"
 
     def __init__(self, canvas: Canvas, rect_size: int = 25):
         self.canvas = canvas
