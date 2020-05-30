@@ -42,12 +42,13 @@ class Application(tk.Frame):
 
         new_state = self.game.update()
         # self.grid.state = new_state
-        self.grid.apply_game_state(new_state)
+        self.grid.game_state = new_state
         self.grid.redraw()
         # sleep(self.game.interval)
 
     def stop(self):
         self.game.running = False
+
 
 root = tk.Tk()
 app = Application(master=root)

@@ -52,18 +52,16 @@ class Grid(object):
         self.canvas = canvas
         self.rect_size = rect_size
         self.state = [[States.DEAD for y in range(self.height)] for x in range(self.width)]
-        self.game_state = {}
+        self.game_state = []
         self.canvas.bind("<Button-1>", self.update)
 
     def draw(self):
         for x in range(self.width):
             for y in range(self.height):
-                if self.state[x][y] == States.ALIVE:
+                if Vector(x, y) in self.game_state:
                     fill = self.occupied_fill
-                elif self.state[x][y] == States.DEAD:
-                    fill = self.dead_fill
                 else:
-                    fill = self.vacant_fill
+                    fill = self.dead_fill
 
                 self.canvas.create_rectangle(
                     x * self.rect_size,
@@ -74,32 +72,18 @@ class Grid(object):
                     fill=fill
                 )
 
-    def update(self, event: Event):
+    def update(self, event: Event) -> None:
         x = floor(event.x / self.rect_size)
         y = floor(event.y / self.rect_size)
+        clicked_vector = Vector(x, y)
 
-        try:
-            if self.state[x][y] == States.DEAD:
-                self.state[x][y] = States.ALIVE
-                self.game_state[Vector(x, y)] = States.ALIVE
-            elif self.state[x][y] == States.ALIVE:
-                self.state[x][y] = States.DEAD
-                self.game_state[Vector(x, y)] = States.DEAD
-            self.redraw()
-        except IndexError:
-            pass
+        if clicked_vector in self.game_state:
+            self.game_state.remove(clicked_vector)
+        else:
+            self.game_state.append(clicked_vector)
 
-    def apply_game_state(self, new_game_state: dict):
-        self.game_state = new_game_state
+        self.redraw()
 
-        for x in range(self.width):
-            for y in range(self.height):
-                position = Vector(x, y)
-                if position in new_game_state:
-                    self.state[x][y] = new_game_state[position]
-                else:
-                    self.state[x][y] = States.DEAD
-
-    def redraw(self):
+    def redraw(self) -> None:
         self.canvas.delete("all")
         self.draw()

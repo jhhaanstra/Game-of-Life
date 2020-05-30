@@ -19,7 +19,7 @@ class Game(object):
 
     interval = 1
     running = True
-    game_state = {}
+    game_state = []
     width = 20
     height = 15
 
@@ -30,11 +30,11 @@ class Game(object):
                 if self.state[x][y] != States.DEAD:
                     self.game_state[Vector(x, y)] = self.state[x][y]
 
-    def update(self) -> dict:
-        new_state = {}
+    def update(self) -> list:
+        new_state = []
         neighbours = {}
 
-        for position, state in self.game_state.items():
+        for position in self.game_state:
             living_neighbours_count = 0
 
             # if state == States.DEAD:
@@ -43,8 +43,7 @@ class Game(object):
             for neighbour in self.NEIGHBOURING_POSITIONS:
                 neighbouring_position = position + neighbour
                 if neighbouring_position in self.game_state:
-                    if self.game_state[neighbouring_position] == States.ALIVE:
-                        living_neighbours_count += 1
+                    living_neighbours_count += 1
 
                 if neighbouring_position not in neighbours:
                     neighbours[neighbouring_position] = 0
@@ -57,22 +56,22 @@ class Game(object):
                     count=living_neighbours_count
                 ))
 
-            # - Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-            # - Any live cell with more than three live neighbours dies, as if by overpopulation.
-            if state == States.ALIVE and (living_neighbours_count < 2 or living_neighbours_count > 3):
-                new_state[position] = States.DEAD
+            # # - Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            # # - Any live cell with more than three live neighbours dies, as if by overpopulation.
+            # if living_neighbours_count < 2 or living_neighbours_count > 3:
+            #     pass
 
             # - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-            elif state == States.DEAD and living_neighbours_count == 3:
-                new_state[position] = States.ALIVE
+            if living_neighbours_count == 3:
+                new_state.append(position)
 
-            # - Any live cell with two or three live neighbours lives on to the next generation.
-            else:
-                new_state[position] = state
+            # # - Any live cell with two or three live neighbours lives on to the next generation.
+            # else:
+            #     new_state.append(position)
 
         for neighbouring_position, count in neighbours.items():
             if count == 3:
-                self.game_state[neighbouring_position] = States.ALIVE
+                new_state.append(neighbouring_position)
 
         self.game_state = new_state
         return self.game_state
