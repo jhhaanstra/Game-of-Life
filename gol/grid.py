@@ -46,6 +46,7 @@ class Grid(object):
     occupied_fill = "#000000"
     dead_fill = "#ffffff"
     outline_color = "#c1c1c1"
+    to_delete = []
 
     def __init__(self, canvas: Canvas, rect_size: int = 25):
         self.canvas = canvas
@@ -62,14 +63,14 @@ class Grid(object):
                 else:
                     fill = self.dead_fill
 
-                self.canvas.create_rectangle(
+                self.to_delete.append(self.canvas.create_rectangle(
                     x * self.rect_size,
                     y * self.rect_size,
                     (x * self.rect_size) + self.rect_size,
                     (y * self.rect_size) + self.rect_size,
                     outline=self.outline_color,
                     fill=fill
-                )
+                ))
 
     def update(self, event: Event) -> None:
         x = floor(event.x / self.rect_size)
@@ -84,5 +85,9 @@ class Grid(object):
         self.redraw()
 
     def redraw(self) -> None:
-        self.canvas.delete("all")
+        current_items = self.canvas.find_all()
         self.draw()
+
+        for item in current_items:
+            self.canvas.delete(item)
+
