@@ -85,7 +85,9 @@ class Grid(object):
         self.redraw()
 
     def redraw(self) -> None:
+        current_items = self.canvas.find_all()
         self.draw()
-        self.canvas.delete(self.to_delete)
-        self.to_delete.clear()
+
+        for item in current_items:
+            self.canvas.delete(item)
 
