@@ -1,4 +1,6 @@
 import tkinter as tk
+from threading import Thread
+from time import sleep
 
 from gol.game import Game
 from gol.grid import Grid
@@ -6,6 +8,7 @@ from gol.grid import Grid
 
 class Application(tk.Frame):
     game = None
+    game_thread = None
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -31,23 +34,47 @@ class Application(tk.Frame):
         self.stop_button = tk.Button(self)
         self.stop_button["text"] = "Stop"
         self.stop_button["command"] = self.stop
+        self.stop_button["state"] = "disabled"
         self.stop_button.pack(side="left", padx=5, pady=5)
+
+        self.reset_button = tk.Button(self)
+        self.reset_button["text"] = "Reset grid"
+        self.reset_button["command"] = self.reset
+        self.reset_button.pack(side="left", padx=5, pady=5)
+
 
         self.close = tk.Button(self, text="close", command=self.master.destroy)
         self.close.pack(side="left", padx=5, pady=5)
 
     def start(self):
-        if not self.game:
-            self.game = Game(self.grid.game_state)
+        self.game = Game(self.grid.game_state)
+        self.game.running = True
+        self.game_thread = Thread(target=self.play)
+        self.game_thread.start()
 
-        new_state = self.game.update()
-        # self.grid.state = new_state
-        self.grid.game_state = new_state
-        self.grid.redraw()
-        # sleep(self.game.interval)
+    def play(self):
+        while self.game.running:
+            new_state = self.game.update()
+            self.stop_button["state"] = "normal"
+            self.start_button["state"] = "disabled"
+            self.reset_button["state"] = "disabled"
+
+            # self.grid.state = new_state
+            self.grid.game_state = new_state
+            self.grid.redraw()
+            sleep(self.game.interval)
 
     def stop(self):
         self.game.running = False
+        self.game_thread.join()
+        self.start_button["state"] = "normal"
+        self.stop_button["state"] = "disabled"
+        self.reset_button["state"] = "normal"
+
+    def reset(self):
+        self.grid.game_state = []
+        self.grid.redraw()
+
 
 
 root = tk.Tk()

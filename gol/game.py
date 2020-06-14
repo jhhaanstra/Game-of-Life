@@ -2,7 +2,7 @@ from gol.grid import Vector
 
 
 class Game(object):
-    NEIGHBOURING_POSITIONS = [
+    _NEIGHBOURING_POSITIONS = [
         Vector(1, 0),
         Vector(0, 1),
         Vector(1, 1),
@@ -13,8 +13,8 @@ class Game(object):
         Vector(1, -1)
     ]
 
-    interval = 1
-    running = True
+    interval = 0.3
+    running = False
     game_state = []
     width = 20
     height = 15
@@ -29,7 +29,7 @@ class Game(object):
         for position in self.game_state:
             living_neighbours_count = 0
 
-            for neighbour in self.NEIGHBOURING_POSITIONS:
+            for neighbour in self._NEIGHBOURING_POSITIONS:
                 neighbouring_position = position + neighbour
                 if neighbouring_position in self.game_state:
                     living_neighbours_count += 1
