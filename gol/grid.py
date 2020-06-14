@@ -54,10 +54,20 @@ class Grid(object):
         self.state = [[States.DEAD for y in range(self.height)] for x in range(self.width)]
         self.game_state = []
         self.canvas.bind("<Button-1>", self.update)
+        self.canvas.bind("<Control-Button-4>", self.zoom)
+        self.canvas.bind("<Control-Button-5>", self.zoom)
+
+    def zoom(self, event: Event):
+        if event.num == 5:
+            self.rect_size = round(self.width * 1.2)
+        else:
+            self.rect_size = round(self.width * 0.8)
+
+        self.redraw()
 
     def draw(self):
-        for x in range(self.width):
-            for y in range(self.height):
+        for x in range(round(int(self.canvas['width']) / self.rect_size)):
+            for y in range(round(int(self.canvas['height']) / self.rect_size)):
                 if Vector(x, y) in self.game_state:
                     fill = self.occupied_fill
                 else:

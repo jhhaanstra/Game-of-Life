@@ -14,7 +14,7 @@ class Game(object):
     ]
 
     interval = 0.3
-    running = False
+    is_running = False
     game_state = []
     width = 20
     height = 15

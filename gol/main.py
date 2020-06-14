@@ -20,19 +20,15 @@ class Application(tk.Frame):
         self.master = master
 
         self.pack()
-        self.create_widgets()
+        self.pack_widgets()
         self.grid = Grid(self.canvas)
         self.grid.draw()
 
-    def create_widgets(self):
+    def pack_widgets(self):
         self.canvas.pack(side="top", padx=5, pady=5)
-
         self.start_button.pack(side="left", padx=5, pady=5)
-
         self.stop_button.pack(side="left", padx=5, pady=5)
-
         self.reset_button.pack(side="left", padx=5, pady=5)
-
         self.close.pack(side="left", padx=5, pady=5)
 
     def start(self):
@@ -41,19 +37,19 @@ class Application(tk.Frame):
         self.reset_button["state"] = "disabled"
 
         self.game = Game(self.grid.game_state)
-        self.game.running = True
+        self.game.is_running = True
         self.game_thread = Thread(target=self.play)
         self.game_thread.start()
 
     def play(self):
-        while self.game.running:
+        while self.game.is_running:
             new_state = self.game.update()
             self.grid.game_state = new_state
             self.grid.redraw()
             sleep(self.game.interval)
 
     def stop(self):
-        self.game.running = False
+        self.game.is_running = False
         self.game_thread.join()
 
         self.stop_button["state"] = "disabled"
@@ -65,12 +61,13 @@ class Application(tk.Frame):
         self.grid.redraw()
 
     def quit(self):
-        if self.game.running:
+        if self.game and self.game.is_running:
             self.stop()
 
         self.master.destroy()
 
 
-root = tk.Tk()
-app = Application(master=root)
-app.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Application(master=root)
+    app.mainloop()
