@@ -19,8 +19,9 @@ class Game(object):
     width = 20
     height = 15
 
-    def __init__(self, state: list):
+    def __init__(self, state: list, interval: int = 1):
         self.game_state = state
+        self.interval = interval / 50
 
     def update(self) -> list:
         new_state = []

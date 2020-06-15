@@ -9,6 +9,7 @@ from gol.grid import Grid
 class Application(tk.Frame):
     game = None
     game_thread = None
+    game_interval = 1 / 50
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -17,6 +18,7 @@ class Application(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop, state="disabled")
         self.reset_button = tk.Button(self, text="Reset", command=self.reset)
+        self.speed_scale = tk.Scale(self, from_=1, to=100, orient=tk.HORIZONTAL, command=self.update_game_interval)
         self.master = master
 
         self.pack()
@@ -30,13 +32,19 @@ class Application(tk.Frame):
         self.stop_button.pack(side="left", padx=5, pady=5)
         self.reset_button.pack(side="left", padx=5, pady=5)
         self.close.pack(side="left", padx=5, pady=5)
+        self.speed_scale.pack(side="top", padx=5, pady=5)
+
+    def update_game_interval(self, event: tk.Event):
+        self.game_interval = int(event) / 50
+        if self.game:
+            self.game.interval = self.game_interval
 
     def start(self):
         self.stop_button["state"] = "normal"
         self.start_button["state"] = "disabled"
         self.reset_button["state"] = "disabled"
 
-        self.game = Game(self.grid.game_state)
+        self.game = Game(self.grid.game_state, self.game_interval)
         self.game.is_running = True
         self.game_thread = Thread(target=self.play)
         self.game_thread.start()

@@ -40,6 +40,8 @@ class Cell(object):
 
 class Grid(object):
     canvas = None
+    start_position = None
+    offset = Vector(0, 0)
     rect_size = 25
     width = 20
     height = 15
@@ -53,22 +55,51 @@ class Grid(object):
         self.rect_size = rect_size
         self.state = [[States.DEAD for y in range(self.height)] for x in range(self.width)]
         self.game_state = []
+        self.moving = False
         self.canvas.bind("<Button-1>", self.update)
         self.canvas.bind("<Control-Button-4>", self.zoom)
         self.canvas.bind("<Control-Button-5>", self.zoom)
+        self.canvas.bind("<Control-Button-1>", self.enable_moving)
+        self.canvas.bind("<Control-ButtonRelease-1>", self.disable_moving)
+        self.canvas.bind("<Control-B1-Motion>", self.move_grid)
+
+    def move_grid(self, event: Event):
+        self.offset.x += (event.x - self.start_position.x)
+        self.offset.y += (event.y - self.start_position.y)
+        self.start_position = Vector(event.x, event.y)
+        self.redraw()
+
+    def enable_moving(self, event: Event):
+        self.start_position = Vector(event.x, event.y)
+
+    def disable_moving(self, event: Event):
+        self.start_position = Vector(0, 0)
 
     def zoom(self, event: Event):
-        if event.num == 5:
-            self.rect_size = round(self.width * 1.2)
-        else:
-            self.rect_size = round(self.width * 0.8)
+        if self.start_position is None:
+            self.enable_moving(event)
+
+        if event.num == 4 and self.rect_size < 50:
+            self.rect_size = round(self.rect_size * 1.1)
+
+        elif self.rect_size > 10:
+            self.rect_size = round(self.rect_size * 0.9)
+
+        if self.rect_size > 50:
+            self.rect_size = 50
+
+        if self.rect_size < 10:
+            self.rect_size = 10
 
         self.redraw()
 
     def draw(self):
         for x in range(round(int(self.canvas['width']) / self.rect_size)):
             for y in range(round(int(self.canvas['height']) / self.rect_size)):
-                if Vector(x, y) in self.game_state:
+                new_x = x - floor(self.offset.x / self.rect_size)
+                new_y = y - floor(self.offset.y / self.rect_size)
+
+                if Vector(new_x, new_y) in self.game_state:
                     fill = self.occupied_fill
                 else:
                     fill = self.dead_fill
@@ -85,7 +116,10 @@ class Grid(object):
     def update(self, event: Event) -> None:
         x = floor(event.x / self.rect_size)
         y = floor(event.y / self.rect_size)
-        clicked_vector = Vector(x, y)
+
+        new_x = x - floor(self.offset.x / self.rect_size)
+        new_y = y - floor(self.offset.y / self.rect_size)
+        clicked_vector = Vector(new_x, new_y)
 
         if clicked_vector in self.game_state:
             self.game_state.remove(clicked_vector)
@@ -100,4 +134,3 @@ class Grid(object):
 
         for item in current_items:
             self.canvas.delete(item)
-
